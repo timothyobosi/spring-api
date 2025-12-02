@@ -5,6 +5,7 @@ import com.example.authapi.dto.AuthResponse;
 import com.example.authapi.dto.RegisterRequest;
 import com.example.authapi.entity.User;
 import com.example.authapi.repository.UserRepository;
+import com.example.authapi.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ public class AuthController{
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request){
@@ -36,15 +38,20 @@ public class AuthController{
                 .build();
         userRepository.save(user);
 
-        return ResponseEntity.ok(new AuthResponse("JWT_TOKEN_HERE","Registered Successful"));
+        userRepository.save(user);
+        String token = jwtService.generateToken(user);
+
+        return ResponseEntity.ok(new AuthResponse(token,"Registered successfully"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         return userRepository.findByEmail(request.email())
                 .filter(user -> passwordEncoder.matches(request.password(),user.getPassword()))
-                .map(user -> ResponseEntity.ok(
-                        new AuthResponse("JWT_TOKEN_HERE", "Login successful")))
+                .map(user -> {
+                    String token = jwtService.generateToken(user);
+                    return ResponseEntity.ok(new AuthResponse(token,"Login successful"));
+                })
                 .orElse(ResponseEntity.status(401)
                         .body(new AuthResponse(null,"Invalid credentials")));
     }
