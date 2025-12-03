@@ -47,6 +47,8 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/api/auth/google-success",true)
+                )
 //                .formLogin(form->form.disable())
 //                .httpBasic(basic->basic.disable());
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
