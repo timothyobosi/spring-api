@@ -35,6 +35,7 @@ public class AuthController{
         User user = User.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
+                .fullName(request.fullName())
                 .build();
         userRepository.save(user);
 

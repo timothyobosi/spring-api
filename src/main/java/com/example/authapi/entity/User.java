@@ -31,10 +31,21 @@ public class User implements UserDetails {
     @Column(name = "full_name")
     private String fullName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private Role role = Role.USER;
+
     @Override
-    public Collection<?extends GrantedAuthority> getAuthorities(){
-        return List.of(); //Add roles later
+    public Collection<? extends GrantedAuthority> getAuthorities(){
+        return role.getAuthorities();
+
     }
+
+//    @Override
+//    public Collection<?extends GrantedAuthority> getAuthorities(){
+//        return List.of(); //Add roles later
+//    }
 
     @Override
     public String getUsername(){
